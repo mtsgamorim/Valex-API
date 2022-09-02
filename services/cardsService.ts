@@ -1,6 +1,8 @@
 import * as cardRepository from "../repositories/cardRepository.js";
 import * as companyRepository from "../repositories/companyRepository.js";
 import * as employeeRepository from "../repositories/employeeRepository.js";
+import * as paymentRepository from "../repositories/paymentRepository.js";
+import * as rechargeRepository from "../repositories/rechargeRepository.js";
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import Cryptr from "cryptr";
@@ -145,4 +147,36 @@ function verifyPasswordRegex(password: string) {
       message: "Senha deve ser 4 digitos e apenas numeros",
     };
   }
+}
+
+export async function showTransactions(id: string) {
+  const idNumber = returnIdNumber(id);
+  const card = await findCard(id);
+  verifyCardIsActivated(card.password);
+  const payments = await paymentRepository.findByCardId(idNumber);
+  const recharges = await rechargeRepository.findByCardId(idNumber);
+  const balance = calculateBalance(payments, recharges);
+  return {
+    balance,
+    transactions: payments,
+    recharges: recharges,
+  };
+}
+
+function verifyCardIsActivated(password: string | null) {
+  if (password === null) {
+    throw { type: "badRequest", message: "Cartão não ativado" };
+  }
+}
+
+function calculateBalance(payments: any, recharges: any) {
+  let totalBuys = 0;
+  let totalRecharges = 0;
+  for (let i = 0; i < payments.length; i++) {
+    totalBuys += payments[i].amount;
+  }
+  for (let i = 0; i < recharges.length; i++) {
+    totalRecharges += recharges[i].amount;
+  }
+  return totalRecharges - totalBuys;
 }

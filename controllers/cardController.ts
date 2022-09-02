@@ -11,6 +11,11 @@ export async function createCard(req: Request, res: Response) {
 export async function activate(req: Request, res: Response) {
   const id = req.params.id;
   const { securityCode, password } = req.body;
-  const result = await cardServices.activateCard(id, securityCode, password);
+  await cardServices.activateCard(id, securityCode, password);
   res.sendStatus(200);
+}
+export async function getTransactions(req: Request, res: Response) {
+  const id = req.params.id;
+  const result = await cardServices.showTransactions(id);
+  res.status(200).send(result);
 }

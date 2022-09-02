@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createCard, activate } from "../controllers/cardController.js";
+import {
+  createCard,
+  activate,
+  getTransactions,
+} from "../controllers/cardController.js";
 import { apiKeyValidator } from "../middlewares/apiKeyValidator.js";
 import validateSchema from "../middlewares/schemaValidator.js";
 import createCardSchema from "../schemas/createCardSchema.js";
@@ -19,5 +23,7 @@ route.patch(
   validateSchema(activateCardSchema),
   activate
 );
+
+route.get("/cards/transactions/:id", getTransactions);
 
 export default route;
