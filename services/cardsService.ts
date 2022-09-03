@@ -9,6 +9,12 @@ import Cryptr from "cryptr";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import customParseFormat from "dayjs/plugin/customParseFormat.js";
+import {
+  verifyApiKey,
+  findCard,
+  verifyCardIsActivated,
+  validateDate,
+} from "./utilsService.js";
 
 dayjs.extend(customParseFormat);
 dotenv.config();
@@ -42,13 +48,6 @@ export async function insertCardService(
   };
 
   await cardRepository.insert(cardData);
-}
-
-async function verifyApiKey(apikey: string) {
-  const company = await companyRepository.findByApiKey(apikey);
-  if (!company) {
-    throw { type: "unauthorized", message: "Api-Key invalid" };
-  }
 }
 
 async function verifyCardAlreadyExist(
@@ -103,28 +102,12 @@ export async function activateCard(id: string, cvc: string, password: string) {
   await cardRepository.update(idNumber, { password: passwordEncrypted });
 }
 
-async function findCard(id: string) {
-  const card = await cardRepository.findById(Number(id));
-  if (!card) {
-    throw { type: "notFound", message: "Cartão não cadastrado" };
-  }
-  return card;
-}
-
 function returnIdNumber(id: string) {
   const idNumber = Number(id);
   if (isNaN(idNumber)) {
     throw { type: "notFound", message: "Cartão ID deve ser um número" };
   }
   return idNumber;
-}
-
-function validateDate(expirationDate: string) {
-  const today = dayjs();
-  const expiration = dayjs(expirationDate, "MM/YY");
-  if (dayjs(today).isAfter(expiration)) {
-    throw { type: "notAcceptable", message: "Cartão já não é mais válido" };
-  }
 }
 
 function verifyCardAlreadyActivated(password: string | null) {
@@ -161,12 +144,6 @@ export async function showTransactions(id: string) {
     transactions: payments,
     recharges: recharges,
   };
-}
-
-function verifyCardIsActivated(password: string | null) {
-  if (password === null) {
-    throw { type: "badRequest", message: "Cartão não ativado" };
-  }
 }
 
 function calculateBalance(payments: any, recharges: any) {
