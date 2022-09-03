@@ -14,8 +14,23 @@ export async function activate(req: Request, res: Response) {
   await cardServices.activateCard(id, securityCode, password);
   res.sendStatus(200);
 }
+
 export async function getTransactions(req: Request, res: Response) {
   const id = req.params.id;
   const result = await cardServices.showTransactions(id);
   res.status(200).send(result);
+}
+
+export async function block(req: Request, res: Response) {
+  const id = req.params.id;
+  const { password } = req.body;
+  await cardServices.block(id, password);
+  res.sendStatus(200);
+}
+
+export async function unblock(req: Request, res: Response) {
+  const id = req.params.id;
+  const { password } = req.body;
+  await cardServices.unblock(id, password);
+  res.sendStatus(200);
 }

@@ -180,3 +180,41 @@ function calculateBalance(payments: any, recharges: any) {
   }
   return totalRecharges - totalBuys;
 }
+
+export async function block(id: string, password: string) {
+  const idNumber = returnIdNumber(id);
+  const card = await findCard(id);
+  verifyCardIsActivated(card.password);
+  validateDate(card.expirationDate);
+  verifyCardBlocked(card.isBlocked);
+  verifyPassword(password, card.password);
+  await cardRepository.update(idNumber, { isBlocked: true });
+}
+
+function verifyCardBlocked(bool: boolean) {
+  if (bool) {
+    throw { type: "badRequest", message: "Cartão ja bloqueado" };
+  }
+}
+
+function verifyCardUnBlocked(bool: boolean) {
+  if (!bool) {
+    throw { type: "badRequest", message: "Cartão não bloqueado" };
+  }
+}
+
+function verifyPassword(password: string, cardPassword: string) {
+  if (!bcrypt.compareSync(password, cardPassword)) {
+    throw { type: "unauthorized", message: "Senha incorreta" };
+  }
+}
+
+export async function unblock(id: string, password: string) {
+  const idNumber = returnIdNumber(id);
+  const card = await findCard(id);
+  verifyCardIsActivated(card.password);
+  validateDate(card.expirationDate);
+  verifyCardUnBlocked(card.isBlocked);
+  verifyPassword(password, card.password);
+  await cardRepository.update(idNumber, { isBlocked: false });
+}
