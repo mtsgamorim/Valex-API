@@ -14,6 +14,10 @@ import {
   findCard,
   verifyCardIsActivated,
   validateDate,
+  verifyCardBlocked,
+  verifyPassword,
+  calculateBalance,
+  returnIdNumber,
 } from "./utilsService.js";
 
 dayjs.extend(customParseFormat);
@@ -102,14 +106,6 @@ export async function activateCard(id: string, cvc: string, password: string) {
   await cardRepository.update(idNumber, { password: passwordEncrypted });
 }
 
-function returnIdNumber(id: string) {
-  const idNumber = Number(id);
-  if (isNaN(idNumber)) {
-    throw { type: "notFound", message: "Cartão ID deve ser um número" };
-  }
-  return idNumber;
-}
-
 function verifyCardAlreadyActivated(password: string | null) {
   if (password !== null) {
     throw { type: "badRequest", message: "Cartão ja cadastrado" };
@@ -146,18 +142,6 @@ export async function showTransactions(id: string) {
   };
 }
 
-function calculateBalance(payments: any, recharges: any) {
-  let totalBuys = 0;
-  let totalRecharges = 0;
-  for (let i = 0; i < payments.length; i++) {
-    totalBuys += payments[i].amount;
-  }
-  for (let i = 0; i < recharges.length; i++) {
-    totalRecharges += recharges[i].amount;
-  }
-  return totalRecharges - totalBuys;
-}
-
 export async function block(id: string, password: string) {
   const idNumber = returnIdNumber(id);
   const card = await findCard(id);
@@ -168,21 +152,9 @@ export async function block(id: string, password: string) {
   await cardRepository.update(idNumber, { isBlocked: true });
 }
 
-function verifyCardBlocked(bool: boolean) {
-  if (bool) {
-    throw { type: "badRequest", message: "Cartão ja bloqueado" };
-  }
-}
-
 function verifyCardUnBlocked(bool: boolean) {
   if (!bool) {
     throw { type: "badRequest", message: "Cartão não bloqueado" };
-  }
-}
-
-function verifyPassword(password: string, cardPassword: string) {
-  if (!bcrypt.compareSync(password, cardPassword)) {
-    throw { type: "unauthorized", message: "Senha incorreta" };
   }
 }
 
