@@ -7,7 +7,7 @@ export async function apiKeyValidator(
 ) {
   const apiKey = req.headers["x-api-key"];
   if (!apiKey) {
-    throw { type: "unauthorized", message: "x-api-key not found" };
+    throw { type: "unauthorized", message: "x-api-key não encontrada" };
   }
   res.locals.apiKey = apiKey;
   next();

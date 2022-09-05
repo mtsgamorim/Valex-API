@@ -8,7 +8,7 @@ dayjs.extend(customParseFormat);
 export async function verifyApiKey(apikey: string) {
   const company = await companyRepository.findByApiKey(apikey);
   if (!company) {
-    throw { type: "unauthorized", message: "Api-Key invalid" };
+    throw { type: "unauthorized", message: "Api-Key invalida" };
   }
 }
 

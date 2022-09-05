@@ -3,7 +3,7 @@ import Joi from "joi";
 const createCardSchema = Joi.object({
   employeeId: Joi.number().required(),
   type: Joi.string()
-    .valid("groceries", "restaurants", "transport", "education", "health")
+    .valid("groceries", "restaurant", "transport", "education", "health")
     .required(),
 });
 

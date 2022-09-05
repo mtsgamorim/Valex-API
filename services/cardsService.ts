@@ -36,6 +36,9 @@ export async function insertCardService(
   const cardholderName = cardNameGenerate(fullName);
   const expirationDate = dayjs().add(5, "year").format("MM/YY");
   const cvc = faker.finance.creditCardCVV();
+  console.log(
+    `O cvc desse cartão é ${cvc}, essa mensagem está aqui apenas para fins de correção do projeto`
+  );
   const securityCode = cryptr.encrypt(cvc);
   const isVirtual = false;
   const isBlocked = false;
@@ -65,7 +68,7 @@ async function verifyCardAlreadyExist(
   if (alreadyExist) {
     throw {
       type: "conflict",
-      message: "Card type already exists for this user",
+      message: "Tipo do cartão ja existe para esse úsuario",
     };
   }
 }
